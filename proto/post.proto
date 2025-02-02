@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package post;
+
+option go_package = "github.com/your_username/grpc-posts-project/proto;postpb";
+
+import "google/protobuf/timestamp.proto";
+
+message Post {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message CreatePostRequest {
+  string title = 1;
+  string content = 2;
+}
+
+message CreatePostResponse {
+  int64 id = 1;
+}
+
+message DeletePostRequest {
+  int64 id = 1;
+}
+
+message DeletePostResponse {
+  bool success = 1;
+}
+
+message ListPostsRequest {
+  int32 limit = 1;
+  int32 page = 2;
+  bool sort_desc = 3;
+}
+
+message ListPostsResponse {
+  repeated Post posts = 1;
+}
+
+service PostService {
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse);
+}
