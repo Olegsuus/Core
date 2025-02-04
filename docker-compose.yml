@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: instagramm_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: instagramm_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ENV: local
+      CONFIG_PATH: ./configs/local.yaml
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package post;
 
-option go_package = "github.com/your_username/grpc-posts-project/proto;postpb";
+option go_package = "settings_grpc/go/core/proto;postpb";
 
 import "google/protobuf/timestamp.proto";
 
@@ -13,35 +13,35 @@ message Post {
   google.protobuf.Timestamp created_at = 4;
 }
 
-message CreatePostRequest {
+message AddPostRequest {
   string title = 1;
   string content = 2;
 }
 
-message CreatePostResponse {
+message AddPostResponse {
   int64 id = 1;
 }
 
-message DeletePostRequest {
+message RemovePostRequest {
   int64 id = 1;
 }
 
-message DeletePostResponse {
+message RemovePostResponse {
   bool success = 1;
 }
 
-message ListPostsRequest {
+message GetManyPostsRequest {
   int32 limit = 1;
   int32 page = 2;
   bool sort_desc = 3;
 }
 
-message ListPostsResponse {
+message GetManyPostsResponse {
   repeated Post posts = 1;
 }
 
 service PostService {
-  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
-  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
-  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse);
+  rpc AddPost(AddPostRequest) returns (AddPostResponse);
+  rpc RemovePost(RemovePostRequest) returns (RemovePostResponse);
+  rpc GetManyPosts(GetManyPostsRequest) returns (GetManyPostsResponse);
 }
