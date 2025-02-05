@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func (s *PostStorage) Remove(ctx context.Context, id int64) error {
+func (s *PostStorage) Remove(ctx context.Context, id string) error {
 	const op = "storage.Remove"
 
 	query := `DELETE FROM posts WHERE id = $1`

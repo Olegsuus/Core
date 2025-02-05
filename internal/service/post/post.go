@@ -13,9 +13,9 @@ type PostService struct {
 }
 
 type postStorageProvider interface {
-	Add(ctx context.Context, post *domain.Post) (int64, error)
+	Add(ctx context.Context, post *domain.Post) (string, error)
 	GetMany(ctx context.Context, settings dto.GetManyPostSettings) ([]*domain.Post, error)
-	Remove(ctx context.Context, id int64) error
+	Remove(ctx context.Context, id string) error
 }
 
 func RegisterPostService(psP postStorageProvider, l *slog.Logger) *PostService {

@@ -7,7 +7,7 @@ option go_package = "settings_grpc/go/core/proto;postpb";
 import "google/protobuf/timestamp.proto";
 
 message Post {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   string content = 3;
   google.protobuf.Timestamp created_at = 4;
@@ -19,11 +19,11 @@ message AddPostRequest {
 }
 
 message AddPostResponse {
-  int64 id = 1;
+  string id = 1;
 }
 
 message RemovePostRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message RemovePostResponse {

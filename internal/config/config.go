@@ -36,7 +36,7 @@ type dbConfig struct {
 func MustConfig() *Config {
 	err := gotenv.Load()
 	if err != nil {
-		log.Panic("error to get .env")
+		log.Println("Warning: .env file not found, using environment variables from OS")
 	}
 
 	configPath := fetchConfigPath()

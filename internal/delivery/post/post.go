@@ -13,9 +13,9 @@ type PostGRPCHandler struct {
 }
 
 type PostServiceProvider interface {
-	Add(ctx context.Context, title, content string) (int64, error)
+	Add(ctx context.Context, title, content string) (string, error)
 	GetMany(ctx context.Context, settings dto.GetManyPostSettings) ([]*domain.Post, error)
-	Remove(ctx context.Context, id int64) error
+	Remove(ctx context.Context, id string) error
 }
 
 func RegisterPostGRPCHandler(psP PostServiceProvider) *PostGRPCHandler {

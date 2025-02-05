@@ -15,8 +15,8 @@ func (s *PostService) GetMany(ctx context.Context, settings dto.GetManyPostSetti
 		settings.Limit = 15
 	}
 
-	if settings.Offset <= 0 {
-		settings.Offset = 1
+	if settings.Offset < 0 {
+		settings.Offset = 0
 	}
 
 	posts, err := s.psP.GetMany(ctx, settings)

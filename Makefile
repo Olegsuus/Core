@@ -1,21 +1,11 @@
-include .env
-
-export ENV
-export CONFIG_PATH
-export POSTGRES_HOST
-export POSTGRES_PORT
-export POSTGRES_DB
-export POSTGRES_USER
-export POSTGRES_PASSWORD
-
-.PHONY: build run docker-build docker-run migrate
+.PHONY: build run docker-build docker-run migrate compose compose-migrate
 
 build:
 	@echo "Сборка приложения..."
-	go build -o  .cmd/app/
+	go build -o app ./cmd/app
 
 run:
-	@echo "Запуск приложения с конфигом: $(CONFIG_PATH)"
+	@echo "Запуск приложения с конфигом: ./configs/local.yaml"
 	./app
 
 docker-build:
@@ -27,6 +17,14 @@ docker-run:
 	docker run -p 8080:8080 core
 
 migrate:
-	@echo "Применение миграций..."
-	# Формируем DSN из переменных из .env.
-	goose -dir migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=disable" up
+	@echo "Применение миграций (локально, если база проброшена на localhost)..."
+	goose -dir migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:5432/$(POSTGRES_DB)?sslmode=disable" up
+
+compose-migrate:
+	@echo "Применяем миграции в контейнерной базе..."
+	docker run --rm --network core_default core \
+      goose -dir migrations postgres "postgres://postgres:postgres@postgres:5432/instagramm_db?sslmode=disable" up
+
+compose:
+	@echo "Поднимаем окружение через docker-compose..."
+	docker-compose up --build

@@ -6,7 +6,7 @@ import (
 	"log/slog"
 )
 
-func (s *PostService) Remove(ctx context.Context, id int64) error {
+func (s *PostService) Remove(ctx context.Context, id string) error {
 	const op = "service.Remove"
 
 	if err := s.psP.Remove(ctx, id); err != nil {

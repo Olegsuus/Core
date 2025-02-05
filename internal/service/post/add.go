@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func (s *PostService) Add(ctx context.Context, title, content string) (int64, error) {
+func (s *PostService) Add(ctx context.Context, title, content string) (string, error) {
 	const op = "service.Add"
 
 	newPost := &domain.Post{
@@ -18,7 +18,7 @@ func (s *PostService) Add(ctx context.Context, title, content string) (int64, er
 	id, err := s.psP.Add(ctx, newPost)
 	if err != nil {
 		s.l.Error("ошибка при добавлении нового поста", slog.String("details", fmt.Sprintf("%s: %w", op, err)))
-		return 0, err
+		return "", err
 	}
 
 	s.l.Info("пост успешно получен")
