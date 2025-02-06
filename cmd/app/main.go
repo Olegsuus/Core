@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Olegsuus/Core/internal/config"
 	handlers "github.com/Olegsuus/Core/internal/delivery/post"
+	"github.com/Olegsuus/Core/internal/logger"
 	service "github.com/Olegsuus/Core/internal/service/post"
 	storage "github.com/Olegsuus/Core/internal/storage/post"
 	"github.com/Olegsuus/Core/internal/storage/postgres"
@@ -22,6 +23,12 @@ func main() {
 		log.Fatalf("failed to connect db: %w", err)
 	}
 	defer pool.Close()
+
+	logg, err := logger.InitLogger(cfg.Env, cfg.LogFilePath)
+	if err != nil {
+		log.Fatalf("ошибка при загрузки лог файла: %v", err)
+	}
+	defer logg.Close()
 
 	l := slog.Default()
 

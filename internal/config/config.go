@@ -17,7 +17,8 @@ type Config struct {
 }
 
 type yamlConfig struct {
-	Port int `mapstructure:"port"`
+	Port        int    `mapstructure:"port"`
+	LogFilePath string `mapstructure:"log_file_path"`
 }
 
 type envConfig struct {
