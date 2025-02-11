@@ -2,52 +2,74 @@ package storage
 
 import (
 	"context"
-	"fmt"
-	"github.com/Olegsuus/Core/internal/domain/dto"
-	"github.com/Olegsuus/Core/internal/domain/post"
-	"github.com/Olegsuus/Core/internal/errors"
-	"log"
+	"github.com/Masterminds/squirrel"
+	models2 "github.com/Olegsuus/Core/internal/models"
+	"github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *PostStorage) GetMany(ctx context.Context, settings dto.GetManyPostSettings) ([]*domain.Post, error) {
-	const op = "storage.GetMany"
-
+func (s *PostStorage) StorageGetMany(ctx context.Context, settings models2.GetManyPostSettings) ([]models2.Post, error) {
 	order := "ASC"
 	if settings.SortDesc {
 		order = "DESC"
 	}
 
-	query := fmt.Sprintf(
-		"SELECT id, title, content, created_at FROM posts ORDER BY created_at %s LIMIT $1 OFFSET $2",
-		order,
-	)
+	query, args, err := squirrel.
+		Select("id", "title", "content", "created_at").
+		From("post").
+		OrderBy("created_at" + order).
+		Limit(uint64(settings.Limit)).
+		Offset(uint64(settings.Offset)).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
 
-	rows, err := s.pg.Query(ctx, query, settings.Limit, settings.Offset)
 	if err != nil {
-		log.Printf("ошибка при получении списка постов: (%s: %w)", op, err)
+		return nil, errors.AppError{
+			BusinessError: err.Error(),
+			UserError:     "ошибка при получении списка постов",
+		}
+	}
+
+	var posts []models2.Post
+	if err := s.db.SelectContext(ctx, &posts, query, args...); err != nil {
 		return nil, errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "не удалось получить список постов",
 			Status:        400,
 		}
 	}
-	defer rows.Close()
 
-	var posts []*domain.Post
-	for rows.Next() {
-		var post domain.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt); err != nil {
-			log.Printf("ошибка при декодировании поста: (%s: %w)", op, err)
-			return nil, errors.AppError{
-				BusinessError: err.Error(),
-				UserError:     "ошибка при получении списка постов",
-				Status:        500,
-			}
+	return posts, nil
+}
+
+func (s *PostStorage) StorageGetFeed(ctx context.Context, subscriberID string, settings models2.GetManyPostSettings) ([]models2.Post, error) {
+
+	query, args, err := squirrel.
+		Select("p.id", "p.user_id", "p.title", "p.content", "p.created_at").
+		From("posts p").
+		Join("subscriptions s ON p.user_id = s.subscribed_to_id").
+		Where(squirrel.Eq{"s.subscriber_id": subscriberID}).
+		OrderBy("p.created_at " + "DESC").
+		Limit(uint64(settings.Limit)).
+		Offset(uint64(settings.Offset)).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, errors.AppError{
+			BusinessError: err.Error(),
+			UserError:     "ошибка при составлении запроса на получении ленты",
+			Status:        500,
 		}
-		posts = append(posts, &post)
 	}
 
-	log.Print("список постов успешно получен")
+	var posts []models2.Post
+	if err = s.db.GetContext(ctx, &posts, query, args...); err != nil {
+		return nil, errors.AppError{
+			BusinessError: err.Error(),
+			UserError:     "не удалось получить ленту",
+			Status:        400,
+		}
+	}
 
 	return posts, nil
 }

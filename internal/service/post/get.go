@@ -3,14 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/domain/dto"
-	domain "github.com/Olegsuus/Core/internal/domain/post"
-	"log/slog"
+	models2 "github.com/Olegsuus/Core/internal/models"
 )
 
-func (s *PostService) GetMany(ctx context.Context, settings dto.GetManyPostSettings) ([]*domain.Post, error) {
-	const op = "service.GetMany"
-
+func (s *PostService) ServiceGetMany(ctx context.Context, settings models2.GetManyPostSettings) ([]models2.Post, error) {
 	if settings.Limit <= 0 {
 		settings.Limit = 15
 	}
@@ -19,13 +15,19 @@ func (s *PostService) GetMany(ctx context.Context, settings dto.GetManyPostSetti
 		settings.Offset = 0
 	}
 
-	posts, err := s.psP.GetMany(ctx, settings)
+	posts, err := s.psP.StorageGetMany(ctx, settings)
 	if err != nil {
-		s.l.Error("ошибка при получении списка постов", slog.String("details", fmt.Sprintf("%s: %w", op, err)))
-		return nil, err
+		return nil, fmt.Errorf("StorageGetMany: %w", err)
 	}
 
-	s.l.Info("список постов успешно получен")
+	return posts, nil
+}
+
+func (s *PostService) ServiceGetFeed(ctx context.Context, subscriberID string, settings models2.GetManyPostSettings) ([]models2.Post, error) {
+	posts, err := s.psP.StorageGetFeed(ctx, subscriberID, settings)
+	if err != nil {
+		return nil, fmt.Errorf("StorageGetFeed: %w", err)
+	}
 
 	return posts, nil
 }

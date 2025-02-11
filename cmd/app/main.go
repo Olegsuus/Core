@@ -2,53 +2,25 @@ package main
 
 import (
 	"fmt"
-	"github.com/Olegsuus/Core/internal/config"
-	handlers "github.com/Olegsuus/Core/internal/delivery/post"
-	"github.com/Olegsuus/Core/internal/logger"
-	service "github.com/Olegsuus/Core/internal/service/post"
-	storage "github.com/Olegsuus/Core/internal/storage/post"
-	"github.com/Olegsuus/Core/internal/storage/postgres"
-	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
-	"google.golang.org/grpc"
+	"github.com/Olegsuus/Core/cmd/config"
+	"github.com/Olegsuus/Core/internal/app"
+	"github.com/Olegsuus/Core/internal/metrics"
 	"log"
-	"log/slog"
-	"net"
 )
 
 func main() {
 	cfg := config.MustConfig()
 
-	pool, err := postgres.NewConnectDB(*cfg)
+	metricsAddr := fmt.Sprintf(":%d", cfg.Metrics.Port)
+	go metrics.StartHTTPServer(metricsAddr)
+
+	appInstance, err := app.NewApp(cfg, metrics.UnaryServerInterceptor())
 	if err != nil {
-		log.Fatalf("failed to connect db: %w", err)
-	}
-	defer pool.Close()
-
-	logg, err := logger.InitLogger(cfg.Env, cfg.LogFilePath)
-	if err != nil {
-		log.Fatalf("ошибка при загрузки лог файла: %v", err)
-	}
-	defer logg.Close()
-
-	l := slog.Default()
-
-	postStorage := storage.RegisterNewPostStorage(pool)
-	postService := service.RegisterPostService(postStorage, l)
-	postGRPCHandler := handlers.RegisterPostGRPCHandler(postService)
-
-	addr := fmt.Sprintf(":%d", cfg.Port)
-	lis, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Fatalf("failed to listen on %s: %v", addr, err)
+		log.Fatalf("failed to initialize app: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-
-	postpb.RegisterPostServiceServer(grpcServer, postGRPCHandler)
-
-	log.Printf("gRPC server started on %s", addr)
-
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve gRPC server: %v", err)
+	if err := appInstance.Serve(); err != nil {
+		log.Printf("failed to connect gRPC server: %v", err)
 	}
+	defer appInstance.Stop()
 }

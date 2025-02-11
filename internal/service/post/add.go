@@ -3,25 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/domain/post"
-	"log/slog"
+	"github.com/Olegsuus/Core/internal/models"
 )
 
-func (s *PostService) Add(ctx context.Context, title, content string) (string, error) {
-	const op = "service.Add"
-
-	newPost := &domain.Post{
+func (s *PostService) ServiceAdd(ctx context.Context, title, content string) (string, error) {
+	newPost := &models.Post{
 		Title:   title,
 		Content: content,
 	}
 
-	id, err := s.psP.Add(ctx, newPost)
+	id, err := s.psP.StorageAddPost(ctx, newPost)
 	if err != nil {
-		s.l.Error("ошибка при добавлении нового поста", slog.String("details", fmt.Sprintf("%s: %w", op, err)))
-		return "", err
+		return "", fmt.Errorf("StorageAdd: %w", err)
 	}
-
-	s.l.Info("пост успешно получен")
 
 	return id, nil
 }

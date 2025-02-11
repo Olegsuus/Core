@@ -1,4 +1,4 @@
-package dto
+package models
 
 type GetManyPostSettings struct {
 	Limit    int

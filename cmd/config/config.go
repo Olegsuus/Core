@@ -1,14 +1,12 @@
 package config
 
 import (
-	"flag"
 	"github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/spf13/viper"
 	"github.com/subosito/gotenv"
+	"gopkg.in/yaml.v3"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 type Config struct {
@@ -17,8 +15,21 @@ type Config struct {
 }
 
 type yamlConfig struct {
-	Port        int    `mapstructure:"port"`
-	LogFilePath string `mapstructure:"log_file_path"`
+	Server  serverConfig  `yaml:"server"`
+	Log     logConfig     `yaml:"log"`
+	Metrics metricsConfig `yaml:"metrics"`
+}
+
+type serverConfig struct {
+	Port int `yaml:"port"`
+}
+
+type logConfig struct {
+	LogFilePath string `yaml:"log_file_path"`
+}
+
+type metricsConfig struct {
+	Port int `yaml:"port"`
 }
 
 type envConfig struct {
@@ -40,7 +51,7 @@ func MustConfig() *Config {
 		log.Println("Warning: .env file not found, using environment variables from OS")
 	}
 
-	configPath := fetchConfigPath()
+	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		log.Panic("error to init config path")
 	}
@@ -50,18 +61,14 @@ func MustConfig() *Config {
 		log.Panicf("config file does not exist: %s", configPath)
 	}
 
-	viper.AddConfigPath(filepath.Dir(configPath))
-	viper.SetConfigType("yaml")
-	viper.SetConfigName(filepath.Base(configPath))
-
-	err = viper.ReadInConfig()
+	data, err := os.ReadFile(configPath)
 	if err != nil {
-		log.Panicf("failed to read config file: %w", err)
+		log.Panicf("failed to read config file: %v", err)
 	}
 
 	var yamlCfg yamlConfig
 
-	err = viper.Unmarshal(&yamlCfg)
+	err = yaml.Unmarshal(data, &yamlCfg)
 	if err != nil {
 		log.Panicf("failed to unmarshal config: %w", err)
 	}
@@ -82,17 +89,4 @@ func MustConfig() *Config {
 		&yamlCfg,
 		&envCfg,
 	}
-}
-
-func fetchConfigPath() string {
-	var res string
-
-	flag.StringVar(&res, "config", "", "path to config")
-	flag.Parse()
-
-	if res == "" {
-		res = os.Getenv("CONFIG_PATH")
-	}
-
-	return res
 }

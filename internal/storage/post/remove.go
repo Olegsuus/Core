@@ -3,34 +3,51 @@ package storage
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/errors"
-	"log"
+	"github.com/Masterminds/squirrel"
+	"github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *PostStorage) Remove(ctx context.Context, id string) error {
-	const op = "storage.Remove"
+func (s *PostStorage) StorageRemovePost(ctx context.Context, id string) error {
+	s.l.Info("удаление поста", "id", id)
 
-	query := `DELETE FROM posts WHERE id = $1`
+	query, args, err := squirrel.
+		Delete("posts").
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
 
-	ct, err := s.pg.Exec(ctx, query, id)
 	if err != nil {
-		log.Printf("ошибка при удалении поста: (%s: %w)", op, err)
+		return errors.AppError{
+			BusinessError: err.Error(),
+			UserError:     "ошибка при удалении поста",
+		}
+	}
+
+	res, err := s.db.ExecContext(ctx, query, args...)
+	if err != nil {
 		return errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "ошибка при удалении поста",
 			Status:        500,
 		}
 	}
-	if ct.RowsAffected() == 0 {
-		log.Printf("не найден пост с таким id: %d", id)
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
 		return errors.AppError{
-			BusinessError: fmt.Sprintf("не найден пост с id = %d", id),
+			BusinessError: err.Error(),
+			UserError:     "не удалось определить количество удаленных записей",
+			Status:        500,
+		}
+	}
+
+	if rowsAffected == 0 {
+		return errors.AppError{
+			BusinessError: fmt.Sprintf("не найден пост с id = %s", id),
 			UserError:     "пост не найден",
 			Status:        400,
 		}
 	}
-
-	log.Printf("пост успешно удален")
 
 	return nil
 }
