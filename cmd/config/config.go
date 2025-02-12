@@ -15,6 +15,7 @@ type Config struct {
 }
 
 type yamlConfig struct {
+	Env     string        `yaml:"env"`
 	Server  serverConfig  `yaml:"server"`
 	Log     logConfig     `yaml:"log"`
 	Metrics metricsConfig `yaml:"metrics"`
@@ -33,8 +34,7 @@ type metricsConfig struct {
 }
 
 type envConfig struct {
-	Env string `env:"env"`
-	DB  dbConfig
+	DB dbConfig
 }
 
 type dbConfig struct {

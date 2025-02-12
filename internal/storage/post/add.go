@@ -14,7 +14,7 @@ func (s *PostStorage) StorageAddPost(ctx context.Context, post *models.Post) (st
 	query, args, err := squirrel.
 		Insert("posts").
 		Columns("user_id", "title", "content", "created_at").
-		Values(post.Title, post.Content, time.Now()).
+		Values(post.UserID, post.Title, post.Content, time.Now()).
 		Suffix("RETURNING id").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
