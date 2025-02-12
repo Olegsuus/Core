@@ -56,7 +56,7 @@ func NewApp(cfg *config.Config, interceptor grpc.UnaryServerInterceptor) (*App, 
 	userStorage := storage2.RegisterNewUserStorage(db, l)
 	subStorage := storage3.RegisterNewSubscriptionStorage(db, l)
 
-	postService := service.RegisterPostService(postStorage)
+	postService := service.RegisterPostService(postStorage, userStorage)
 	userService := service2.RegisterNewServiceUser(userStorage)
 	subService := service3.RegisterNewSubscriptionService(subStorage)
 

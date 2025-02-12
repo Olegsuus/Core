@@ -63,7 +63,8 @@ message User {
   string id = 1;
   string name = 2;
   string email = 3;
-  google.protobuf.Timestamp created_at = 4;
+  string password = 4;
+  google.protobuf.Timestamp created_at = 5;
 }
 
 message AddUserRequest {
@@ -76,8 +77,17 @@ message AddUserResponse {
   string id = 1;
 }
 
+message GetUserRequest{
+  string id = 1;
+}
+
+message GetUserResponse{
+  User user = 1;
+}
+
 service UserService {
   rpc AddUser(AddUserRequest) returns (AddUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
 }
 
 message SubscribeRequest {
