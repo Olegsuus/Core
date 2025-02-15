@@ -7,7 +7,7 @@ import (
 
 type UserStorageProvider interface {
 	StorageAddUser(ctx context.Context, user *models.User) (string, error)
-	StorageGetUser(ctx context.Context, userID string) (*models.User, error)
+	StorageGetUser(ctx context.Context, userID string) (models.User, error)
 }
 
 type SubscriptionStorageProvider interface {

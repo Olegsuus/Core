@@ -7,23 +7,25 @@ import (
 	"github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *UserStorage) StorageGetUser(ctx context.Context, userID string) (*models.User, error) {
+func (s *UserStorage) StorageGetUser(ctx context.Context, userID string) (models.User, error) {
+	var user models.User
+
 	query, args, err := squirrel.
 		Select("id", "name", "email", "password", "created_at").
 		From("users").
 		Where(squirrel.Eq{"id": userID}).
+		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 
 	if err != nil {
-		return nil, errors.AppError{
+		return user, errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "ошибка при составлении запроса",
 		}
 	}
 
-	var user *models.User
-	if err = s.db.SelectContext(ctx, &user, query, args...); err != nil {
-		return nil, errors.AppError{
+	if err = s.db.GetContext(ctx, &user, query, args...); err != nil {
+		return user, errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "не удалось получить пользователя",
 			Status:        400,

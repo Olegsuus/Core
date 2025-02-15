@@ -7,7 +7,7 @@ import (
 
 type UserServiceProvider interface {
 	ServiceAdd(ctx context.Context, name, email, password string) (string, error)
-	ServiceGetUser(ctx context.Context, userID string) (*models.User, error)
+	ServiceGet(ctx context.Context, userID string) (models.User, error)
 }
 
 type SubscriptionServiceProvider interface {

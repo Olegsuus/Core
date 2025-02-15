@@ -9,7 +9,7 @@ import (
 func (s *PostService) ServiceAdd(ctx context.Context, title, content, userID string) (string, error) {
 	user, err := s.usP.StorageGetUser(ctx, userID)
 	if err != nil {
-		return "", fmt.Errorf("GetUserStorage: %w", err)
+		return "", fmt.Errorf("StorageGetUser: %w", err)
 	}
 
 	newPost := &models.Post{

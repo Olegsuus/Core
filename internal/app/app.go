@@ -58,7 +58,7 @@ func NewApp(cfg *config.Config, interceptor grpc.UnaryServerInterceptor) (*App, 
 
 	postService := service.RegisterPostService(postStorage, userStorage)
 	userService := service2.RegisterNewServiceUser(userStorage)
-	subService := service3.RegisterNewSubscriptionService(subStorage)
+	subService := service3.RegisterNewSubscriptionService(subStorage, userStorage)
 
 	postGRPCHandler := handlers.RegisterNewPostGRPCHandler(postService, l)
 	userGRPCHandler := handlers2.RegisterNewUserGRPCHandler(userService, l)

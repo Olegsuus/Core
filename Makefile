@@ -14,7 +14,7 @@ docker-build:
 
 docker-run:
 	@echo "Запуск Docker-контейнера..."
-	docker run -p 8080:8080 core
+	docker run -p 8080:8080 -p 2112:2112 core
 
 migrate:
 	@echo "Применение миграций (локально)..."
@@ -31,3 +31,6 @@ compose:
 
 compose-reset:
 	docker-compose down -v && docker-compose up --build
+
+compose-update-app:
+	dockr-compose down && docker-compose up --build
