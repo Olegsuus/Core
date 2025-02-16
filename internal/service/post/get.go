@@ -3,50 +3,60 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/models"
+	"github.com/Olegsuus/Core/pkg/utils"
+	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
-func (s *PostService) ServiceGetPost(ctx context.Context, postID string) (models.Post, error) {
-	var post models.Post
-
-	post, err := s.psP.StorageGetPost(ctx, postID)
+func (s *PostService) GetPost(ctx context.Context, postID string) (*postpb.Post, error) {
+	post, err := s.postStorage.GetPost(ctx, postID)
 	if err != nil {
-		return post, fmt.Errorf("StorageGetPost: %w", err)
+		return nil, fmt.Errorf("Storage.GetPost: %w", err)
 	}
 
-	return post, nil
+	return modelsToGRPC(post), nil
 }
 
-func (s *PostService) ServiceGetFeed(ctx context.Context, subscriberID string, settings models.GetManySettings) ([]models.Post, error) {
-	if settings.Limit <= 0 {
-		settings.Limit = 15
+func (s *PostService) GetFeed(ctx context.Context, subscriberID string, limit, offset int) ([]*postpb.Post, error) {
+	if limit <= 0 {
+		limit = 15
 	}
 
-	if settings.Offset < 0 {
-		settings.Offset = 0
+	if offset < 0 {
+		offset = 0
 	}
 
-	posts, err := s.psP.StorageGetFeed(ctx, subscriberID, settings)
+	posts, err := s.postStorage.GetFeed(ctx, subscriberID, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("StorageGetFeed: %w", err)
+		return nil, fmt.Errorf("Storage.GetFeed: %w", err)
 	}
 
-	return posts, nil
+	pbPosts := utils.MapAsync(posts, modelsToGRPC)
+
+	return pbPosts, nil
 }
 
-func (s *PostService) ServiceGetMany(ctx context.Context, settings models.GetManySettings) ([]models.Post, error) {
-	if settings.Limit <= 0 {
-		settings.Limit = 15
+func (s *PostService) GetManyPosts(ctx context.Context, limit, offset int, order bool) ([]*postpb.Post, error) {
+	if limit <= 0 {
+		limit = 15
 	}
 
-	if settings.Offset < 0 {
-		settings.Offset = 0
+	if offset < 0 {
+		offset = 0
 	}
 
-	posts, err := s.psP.StorageGetMany(ctx, settings)
+	var sort string
+	if order {
+		sort = "DESC"
+	} else {
+		sort = "ASC"
+	}
+
+	posts, err := s.postStorage.GetManyPosts(ctx, limit, offset, sort)
 	if err != nil {
-		return nil, fmt.Errorf("StorageGetMany: %w", err)
+		return nil, fmt.Errorf("Storage.GetManyPosts: %w", err)
 	}
 
-	return posts, nil
+	pbPosts := utils.MapAsync(posts, modelsToGRPC)
+
+	return pbPosts, nil
 }

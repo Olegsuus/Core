@@ -8,13 +8,13 @@ import (
 
 type UserGRPCHandler struct {
 	postpb.UnimplementedUserServiceServer
-	usp service.UserServiceProvider
-	l   *slog.Logger
+	userService service.UserService
+	l           *slog.Logger
 }
 
-func RegisterNewUserGRPCHandler(usp service.UserServiceProvider, l *slog.Logger) *UserGRPCHandler {
+func NewUserGRPCHandler(userService service.UserService, l *slog.Logger) *UserGRPCHandler {
 	return &UserGRPCHandler{
-		usp: usp,
-		l:   l,
+		userService: userService,
+		l:           l,
 	}
 }

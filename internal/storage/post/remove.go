@@ -7,7 +7,7 @@ import (
 	"github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *PostStorage) StorageRemovePost(ctx context.Context, id string) error {
+func (s *PostStorage) RemovePost(ctx context.Context, id string) error {
 	s.l.Info("удаление поста", "id", id)
 
 	query, args, err := squirrel.
@@ -45,7 +45,7 @@ func (s *PostStorage) StorageRemovePost(ctx context.Context, id string) error {
 		return errors.AppError{
 			BusinessError: fmt.Sprintf("не найден пост с id = %s", id),
 			UserError:     "пост не найден",
-			Status:        400,
+			Status:        404,
 		}
 	}
 

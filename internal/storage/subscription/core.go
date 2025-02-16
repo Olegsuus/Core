@@ -10,7 +10,7 @@ type SubscriptionStorage struct {
 	l  *slog.Logger
 }
 
-func RegisterNewSubscriptionStorage(db *sqlx.DB, l *slog.Logger) *SubscriptionStorage {
+func NewSubscriptionStorage(db *sqlx.DB, l *slog.Logger) *SubscriptionStorage {
 	return &SubscriptionStorage{
 		db: db,
 		l:  l,

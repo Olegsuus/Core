@@ -4,35 +4,34 @@ import (
 	"context"
 	"github.com/Masterminds/squirrel"
 	"github.com/Olegsuus/Core/internal/models"
+	"github.com/Olegsuus/Core/internal/storage"
 	apperrors "github.com/Olegsuus/Core/pkg/errors"
-	"time"
 )
 
-func (s *UserStorage) StorageAddUser(ctx context.Context, user *models.User) (string, error) {
-	s.l.Info("добавление нового пользователя:", user)
+func (s *UserStorage) AddUser(ctx context.Context, userEntity *storage.UserEntity) (*models.User, error) {
+	s.l.Info("добавление нового пользователя:", userEntity)
 	query, args, err := squirrel.
 		Insert("users").
 		Columns("name", "email", "password", "created_at").
-		Values(user.Name, user.Email, user.Password, time.Now()).
-		Suffix("RETURNING id").
+		Values(userEntity.Name, userEntity.Email, userEntity.Password).
+		Suffix("RETURNING id, name, email, password").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 
 	if err != nil {
-		return "", apperrors.AppError{
+		return nil, apperrors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "ошибка при составлении запроса",
 			Status:        500,
 		}
 	}
 
-	var id string
-	if err = s.db.GetContext(ctx, &id, query, args...); err != nil {
-		return "", apperrors.AppError{
+	if err = s.db.GetContext(ctx, &userEntity, query, args...); err != nil {
+		return nil, apperrors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "ошибка при регистрации пользователя",
 		}
 	}
 
-	return id, nil
+	return userEntityToModels(userEntity), nil
 }

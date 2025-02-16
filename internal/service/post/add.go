@@ -4,24 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/Olegsuus/Core/internal/models"
+	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
-func (s *PostService) ServiceAdd(ctx context.Context, title, content, userID string) (string, error) {
-	user, err := s.usP.StorageGetUser(ctx, userID)
-	if err != nil {
-		return "", fmt.Errorf("StorageGetUser: %w", err)
-	}
-
+func (s *PostService) AddPost(ctx context.Context, title, content, userID string) (*postpb.Post, error) {
 	newPost := &models.Post{
+		UserID:  userID,
 		Title:   title,
 		Content: content,
-		UserID:  user.ID,
 	}
 
-	id, err := s.psP.StorageAddPost(ctx, newPost)
+	post, err := s.postStorage.AddPost(ctx, modelsToEntity(newPost))
 	if err != nil {
-		return "", fmt.Errorf("StorageAdd: %w", err)
+		return nil, fmt.Errorf("StorageAdd: %w", err)
 	}
 
-	return id, nil
+	return modelsToGRPC(post), nil
 }

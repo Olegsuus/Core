@@ -4,19 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/Masterminds/squirrel"
+	"github.com/Olegsuus/Core/internal/storage"
 	apperrors "github.com/Olegsuus/Core/pkg/errors"
 	"log/slog"
-	"time"
 )
 
-func (s *SubscriptionStorage) StorageAddSubscribe(ctx context.Context, userID, subscriberToId string) error {
+func (s *SubscriptionStorage) Subscribe(ctx context.Context, subscriptionEntity *storage.SubscriptionEntity) error {
 	s.l.Info("Создание новой подписки", slog.String("details",
-		fmt.Sprintf("пользователь: %s, подписывается на %s", userID, subscriberToId)))
+		fmt.Sprintf("пользователь: %s, подписывается на %s",
+			subscriptionEntity.SubscriberID, subscriptionEntity.SubscribedToID)))
 
 	query, args, err := squirrel.
 		Insert("subscriptions").
 		Columns("subscriber_id", "subscribed_to_id", "created_at").
-		Values(userID, subscriberToId, time.Now()).
+		Values(subscriptionEntity.SubscriberID, subscriptionEntity.SubscribedToID).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 
@@ -35,5 +36,6 @@ func (s *SubscriptionStorage) StorageAddSubscribe(ctx context.Context, userID, s
 			UserError:     "ошибка при подписке",
 		}
 	}
+
 	return nil
 }

@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-func (s *PostService) ServiceRemove(ctx context.Context, id string) error {
+func (s *PostService) RemovePost(ctx context.Context, id string) error {
 
-	if err := s.psP.StorageRemovePost(ctx, id); err != nil {
-		return fmt.Errorf("StorageRemove: %w", err)
+	if err := s.postStorage.RemovePost(ctx, id); err != nil {
+		return fmt.Errorf("Storage.Remove: %w", err)
 	}
 
 	return nil

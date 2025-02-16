@@ -8,9 +8,9 @@ import (
 )
 
 func (h *PostGRPCHandler) RemovePost(ctx context.Context, req *postpb.RemovePostRequest) (*postpb.RemovePostResponse, error) {
-	err := h.psP.ServiceRemove(ctx, req.GetId())
+	err := h.postService.RemovePost(ctx, req.GetId())
 	if err != nil {
-		h.l.Debug("ошибка при удалении нового поста", slog.String("error:", fmt.Sprintf("%w", err)))
+		h.l.Debug("ошибка при удалении нового поста", slog.String("error:", fmt.Sprintf("%s", err)))
 		return nil, err
 	}
 	return &postpb.RemovePostResponse{Success: true}, nil

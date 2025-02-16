@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/models"
+	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
-func (s *UserService) ServiceGet(ctx context.Context, userID string) (models.User, error) {
-	user, err := s.suP.StorageGetUser(ctx, userID)
+func (s *UserService) GetUser(ctx context.Context, userID string) (*postpb.User, error) {
+	user, err := s.userStorage.GetUser(ctx, userID)
 	if err != nil {
-		return models.User{}, fmt.Errorf("StorageGetUser: %w", err)
+		return nil, fmt.Errorf("StorageGetUser: %w", err)
 	}
 
-	return user, nil
+	return modelsToGRPC(user), nil
 }

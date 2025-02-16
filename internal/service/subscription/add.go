@@ -3,16 +3,18 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/Olegsuus/Core/internal/models"
 )
 
-func (s *SubscriptionService) ServiceSubscribe(ctx context.Context, userID, subscribedToID string) error {
-	_, err := s.usp.StorageGetUser(ctx, subscribedToID)
-	if err != nil {
-		return fmt.Errorf("StorageGetUser: %w", err)
+func (s *SubscriptionService) Subscribe(ctx context.Context, userID, subscribedToID string) error {
+	subscription := &models.Subscription{
+		SubscriberID:   userID,
+		SubscribedToID: subscribedToID,
 	}
 
-	if err := s.ssp.StorageAddSubscribe(ctx, userID, subscribedToID); err != nil {
-		return fmt.Errorf("StorageSubscribe: %w", err)
+	if err := s.subscriptionStorage.Subscribe(ctx, modelsToEntity(subscription)); err != nil {
+		return fmt.Errorf("Storage.Subscribe: %w", err)
 	}
+
 	return nil
 }

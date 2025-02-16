@@ -8,13 +8,13 @@ import (
 )
 
 func (h *UserGRPCHandler) AddUser(ctx context.Context, req *postpb.AddUserRequest) (*postpb.AddUserResponse, error) {
-	id, err := h.usp.ServiceAdd(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
+	user, err := h.userService.AddUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
 	if err != nil {
-		h.l.Debug("ошибка при добавлении нового пользователя", slog.String("error:", fmt.Sprintf("%w", err)))
+		h.l.Debug("ошибка при добавлении нового пользователя", slog.String("error:", fmt.Sprintf("%s", err)))
 		return nil, err
 	}
 
 	return &postpb.AddUserResponse{
-		Id: id,
+		Id: user.Id,
 	}, nil
 }

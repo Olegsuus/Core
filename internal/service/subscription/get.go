@@ -3,23 +3,19 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Olegsuus/Core/internal/models"
+	"github.com/Olegsuus/Core/pkg/utils"
+	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
-func (s *SubscriptionService) ServiceGetSubscribers(ctx context.Context, userID string, settings models.GetManySettings,
-) ([]models.User, error) {
+func (s *SubscriptionService) GetSubscribers(ctx context.Context, userID string, limit, offset int,
+) ([]*postpb.User, error) {
 
-	var subscribers []models.User
-
-	_, err := s.usp.StorageGetUser(ctx, userID)
+	subscribers, err := s.subscriptionStorage.GetSubscribers(ctx, userID, limit, offset)
 	if err != nil {
-		return subscribers, fmt.Errorf("StorageGetUser: %w", err)
+		return nil, fmt.Errorf("Storage.GetSubscribers: %w", err)
 	}
 
-	subscribers, err = s.ssp.StorageGetSubscribers(ctx, userID, settings)
-	if err != nil {
-		return subscribers, fmt.Errorf("StorageGetUser: %w", err)
-	}
+	pbSubscribers := utils.MapAsync(subscribers, modelsToGRPC)
 
-	return subscribers, nil
+	return pbSubscribers, nil
 }

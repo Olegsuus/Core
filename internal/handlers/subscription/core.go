@@ -8,13 +8,13 @@ import (
 
 type SubscriptionGRPCHandler struct {
 	postpb.UnimplementedSubscriptionServiceServer
-	ssp service.SubscriptionServiceProvider
-	l   *slog.Logger
+	subscriptionService service.SubscriptionService
+	l                   *slog.Logger
 }
 
-func RegisterNewSubscriptionGRPCHandler(ssp service.SubscriptionServiceProvider, l *slog.Logger) *SubscriptionGRPCHandler {
+func NewSubscriptionGRPCHandler(subscriptionService service.SubscriptionService, l *slog.Logger) *SubscriptionGRPCHandler {
 	return &SubscriptionGRPCHandler{
-		ssp: ssp,
-		l:   l,
+		subscriptionService: subscriptionService,
+		l:                   l,
 	}
 }

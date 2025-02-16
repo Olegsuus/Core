@@ -5,21 +5,21 @@ import (
 	"github.com/Olegsuus/Core/internal/models"
 )
 
-type UserStorageProvider interface {
-	StorageAddUser(ctx context.Context, user *models.User) (string, error)
-	StorageGetUser(ctx context.Context, userID string) (models.User, error)
+type UserStorage interface {
+	AddUser(ctx context.Context, entity *UserEntity) (*models.User, error)
+	GetUser(ctx context.Context, userID string) (*models.User, error)
 }
 
-type SubscriptionStorageProvider interface {
-	StorageUnsubscribe(ctx context.Context, userID, subscribedToID string) error
-	StorageAddSubscribe(ctx context.Context, userID, subscriberToId string) error
-	StorageGetSubscribers(ctx context.Context, userID string, settings models.GetManySettings) ([]models.User, error)
+type SubscriptionStorage interface {
+	Unsubscribe(ctx context.Context, subscriptionEntity *SubscriptionEntity) error
+	Subscribe(ctx context.Context, subscriptionEntity *SubscriptionEntity) error
+	GetSubscribers(ctx context.Context, userID string, limit, offset int) ([]*models.User, error)
 }
 
-type PostStorageProvider interface {
-	StorageAddPost(ctx context.Context, post *models.Post) (string, error)
-	StorageGetMany(ctx context.Context, settings models.GetManySettings) ([]models.Post, error)
-	StorageRemovePost(ctx context.Context, id string) error
-	StorageGetFeed(ctx context.Context, subscriberID string, settings models.GetManySettings) ([]models.Post, error)
-	StorageGetPost(ctx context.Context, postID string) (models.Post, error)
+type PostStorage interface {
+	AddPost(ctx context.Context, postEntity *PostEntity) (*models.Post, error)
+	GetManyPosts(ctx context.Context, limit, offset int, sort string) ([]*models.Post, error)
+	RemovePost(ctx context.Context, id string) error
+	GetFeed(ctx context.Context, subscriberID string, limit, offset int) ([]*models.Post, error)
+	GetPost(ctx context.Context, postID string) (*models.Post, error)
 }
