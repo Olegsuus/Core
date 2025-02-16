@@ -52,17 +52,17 @@ func NewApp(cfg *config.Config, interceptor grpc.UnaryServerInterceptor) (*App, 
 
 	l := slog.Default()
 
-	postStorage := storage.RegisterNewPostStorage(db, l)
-	userStorage := storage2.RegisterNewUserStorage(db, l)
-	subStorage := storage3.RegisterNewSubscriptionStorage(db, l)
+	postStorage := storage.NewPostStorage(db, l)
+	userStorage := storage2.NewUserStorage(db, l)
+	subStorage := storage3.NewSubscriptionStorage(db, l)
 
-	postService := service.RegisterPostService(postStorage, userStorage)
-	userService := service2.RegisterNewServiceUser(userStorage)
-	subService := service3.RegisterNewSubscriptionService(subStorage, userStorage)
+	postService := service.NewPostService(postStorage)
+	userService := service2.NewServiceUser(userStorage)
+	subService := service3.NewSubscriptionService(subStorage)
 
-	postGRPCHandler := handlers.RegisterNewPostGRPCHandler(postService, l)
-	userGRPCHandler := handlers2.RegisterNewUserGRPCHandler(userService, l)
-	subGRPCHandler := handlers3.RegisterNewSubscriptionGRPCHandler(subService, l)
+	postGRPCHandler := handlers.NewPostGRPCHandler(postService, l)
+	userGRPCHandler := handlers2.NewUserGRPCHandler(userService, l)
+	subGRPCHandler := handlers3.NewSubscriptionGRPCHandler(subService, l)
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	lis, err := net.Listen("tcp", addr)
