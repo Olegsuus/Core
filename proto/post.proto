@@ -25,6 +25,14 @@ message AddPostResponse {
   string id = 1;
 }
 
+message GetPostRequest{
+  string id = 1;
+}
+
+message GetPostResponse{
+  Post post = 1;
+}
+
 message RemovePostRequest {
   string id = 1;
 }
@@ -57,6 +65,7 @@ service PostService {
   rpc RemovePost(RemovePostRequest) returns (RemovePostResponse);
   rpc GetManyPosts(GetManyPostsRequest) returns (GetManyPostsResponse);
   rpc GetFeed(GetFeedRequest) returns (GetFeedResponse);
+  rpc GetPost(GetPostRequest) returns (GetPostResponse);
 }
 
 message User {
@@ -99,6 +108,16 @@ message SubscribeResponse {
   bool success = 1;
 }
 
+message GetSubscribersRequest {
+  string user_id = 1;
+  int32 limit = 2;
+  int32 page = 3;
+}
+
+message GetSubscribersResponse{
+  repeated User user = 1;
+}
+
 message UnsubscribeRequest {
   string subscriber_id = 1;
   string subscribed_to_id = 2;
@@ -111,4 +130,5 @@ message UnsubscribeResponse {
 service SubscriptionService {
   rpc Subscribe(SubscribeRequest) returns (SubscribeResponse);
   rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse);
+  rpc GetSubscribers(GetSubscribersRequest) returns (GetSubscribersResponse);
 }

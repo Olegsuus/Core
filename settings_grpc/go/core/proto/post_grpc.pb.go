@@ -23,6 +23,7 @@ const (
 	PostService_RemovePost_FullMethodName   = "/post.PostService/RemovePost"
 	PostService_GetManyPosts_FullMethodName = "/post.PostService/GetManyPosts"
 	PostService_GetFeed_FullMethodName      = "/post.PostService/GetFeed"
+	PostService_GetPost_FullMethodName      = "/post.PostService/GetPost"
 )
 
 // PostServiceClient is the client API for PostService service.
@@ -33,6 +34,7 @@ type PostServiceClient interface {
 	RemovePost(ctx context.Context, in *RemovePostRequest, opts ...grpc.CallOption) (*RemovePostResponse, error)
 	GetManyPosts(ctx context.Context, in *GetManyPostsRequest, opts ...grpc.CallOption) (*GetManyPostsResponse, error)
 	GetFeed(ctx context.Context, in *GetFeedRequest, opts ...grpc.CallOption) (*GetFeedResponse, error)
+	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error)
 }
 
 type postServiceClient struct {
@@ -83,6 +85,16 @@ func (c *postServiceClient) GetFeed(ctx context.Context, in *GetFeedRequest, opt
 	return out, nil
 }
 
+func (c *postServiceClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*GetPostResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPostResponse)
+	err := c.cc.Invoke(ctx, PostService_GetPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostServiceServer is the server API for PostService service.
 // All implementations must embed UnimplementedPostServiceServer
 // for forward compatibility.
@@ -91,6 +103,7 @@ type PostServiceServer interface {
 	RemovePost(context.Context, *RemovePostRequest) (*RemovePostResponse, error)
 	GetManyPosts(context.Context, *GetManyPostsRequest) (*GetManyPostsResponse, error)
 	GetFeed(context.Context, *GetFeedRequest) (*GetFeedResponse, error)
+	GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error)
 	mustEmbedUnimplementedPostServiceServer()
 }
 
@@ -112,6 +125,9 @@ func (UnimplementedPostServiceServer) GetManyPosts(context.Context, *GetManyPost
 }
 func (UnimplementedPostServiceServer) GetFeed(context.Context, *GetFeedRequest) (*GetFeedResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFeed not implemented")
+}
+func (UnimplementedPostServiceServer) GetPost(context.Context, *GetPostRequest) (*GetPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPost not implemented")
 }
 func (UnimplementedPostServiceServer) mustEmbedUnimplementedPostServiceServer() {}
 func (UnimplementedPostServiceServer) testEmbeddedByValue()                     {}
@@ -206,6 +222,24 @@ func _PostService_GetFeed_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PostService_GetPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostServiceServer).GetPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PostService_GetPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostServiceServer).GetPost(ctx, req.(*GetPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PostService_ServiceDesc is the grpc.ServiceDesc for PostService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -228,6 +262,10 @@ var PostService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFeed",
 			Handler:    _PostService_GetFeed_Handler,
+		},
+		{
+			MethodName: "GetPost",
+			Handler:    _PostService_GetPost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -375,8 +413,9 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	SubscriptionService_Subscribe_FullMethodName   = "/post.SubscriptionService/Subscribe"
-	SubscriptionService_Unsubscribe_FullMethodName = "/post.SubscriptionService/Unsubscribe"
+	SubscriptionService_Subscribe_FullMethodName      = "/post.SubscriptionService/Subscribe"
+	SubscriptionService_Unsubscribe_FullMethodName    = "/post.SubscriptionService/Unsubscribe"
+	SubscriptionService_GetSubscribers_FullMethodName = "/post.SubscriptionService/GetSubscribers"
 )
 
 // SubscriptionServiceClient is the client API for SubscriptionService service.
@@ -385,6 +424,7 @@ const (
 type SubscriptionServiceClient interface {
 	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (*SubscribeResponse, error)
 	Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...grpc.CallOption) (*UnsubscribeResponse, error)
+	GetSubscribers(ctx context.Context, in *GetSubscribersRequest, opts ...grpc.CallOption) (*GetSubscribersResponse, error)
 }
 
 type subscriptionServiceClient struct {
@@ -415,12 +455,23 @@ func (c *subscriptionServiceClient) Unsubscribe(ctx context.Context, in *Unsubsc
 	return out, nil
 }
 
+func (c *subscriptionServiceClient) GetSubscribers(ctx context.Context, in *GetSubscribersRequest, opts ...grpc.CallOption) (*GetSubscribersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSubscribersResponse)
+	err := c.cc.Invoke(ctx, SubscriptionService_GetSubscribers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SubscriptionServiceServer is the server API for SubscriptionService service.
 // All implementations must embed UnimplementedSubscriptionServiceServer
 // for forward compatibility.
 type SubscriptionServiceServer interface {
 	Subscribe(context.Context, *SubscribeRequest) (*SubscribeResponse, error)
 	Unsubscribe(context.Context, *UnsubscribeRequest) (*UnsubscribeResponse, error)
+	GetSubscribers(context.Context, *GetSubscribersRequest) (*GetSubscribersResponse, error)
 	mustEmbedUnimplementedSubscriptionServiceServer()
 }
 
@@ -436,6 +487,9 @@ func (UnimplementedSubscriptionServiceServer) Subscribe(context.Context, *Subscr
 }
 func (UnimplementedSubscriptionServiceServer) Unsubscribe(context.Context, *UnsubscribeRequest) (*UnsubscribeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unsubscribe not implemented")
+}
+func (UnimplementedSubscriptionServiceServer) GetSubscribers(context.Context, *GetSubscribersRequest) (*GetSubscribersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscribers not implemented")
 }
 func (UnimplementedSubscriptionServiceServer) mustEmbedUnimplementedSubscriptionServiceServer() {}
 func (UnimplementedSubscriptionServiceServer) testEmbeddedByValue()                             {}
@@ -494,6 +548,24 @@ func _SubscriptionService_Unsubscribe_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SubscriptionService_GetSubscribers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubscribersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubscriptionServiceServer).GetSubscribers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SubscriptionService_GetSubscribers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubscriptionServiceServer).GetSubscribers(ctx, req.(*GetSubscribersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SubscriptionService_ServiceDesc is the grpc.ServiceDesc for SubscriptionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -508,6 +580,10 @@ var SubscriptionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Unsubscribe",
 			Handler:    _SubscriptionService_Unsubscribe_Handler,
+		},
+		{
+			MethodName: "GetSubscribers",
+			Handler:    _SubscriptionService_GetSubscribers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

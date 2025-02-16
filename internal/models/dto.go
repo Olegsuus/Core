@@ -1,6 +1,6 @@
 package models
 
-type GetManyPostSettings struct {
+type GetManySettings struct {
 	Limit    int
 	Offset   int
 	SortDesc bool

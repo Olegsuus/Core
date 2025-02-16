@@ -13,11 +13,13 @@ type UserServiceProvider interface {
 type SubscriptionServiceProvider interface {
 	ServiceSubscribe(ctx context.Context, userID, subscribedToID string) error
 	ServiceUnsubscribe(ctx context.Context, userID, subscribedToID string) error
+	ServiceGetSubscribers(ctx context.Context, userID string, settings models.GetManySettings) ([]models.User, error)
 }
 
 type PostServiceProvider interface {
 	ServiceAdd(ctx context.Context, title, content, userID string) (string, error)
 	ServiceRemove(ctx context.Context, id string) error
-	ServiceGetMany(ctx context.Context, settings models.GetManyPostSettings) ([]models.Post, error)
-	ServiceGetFeed(ctx context.Context, subscriberID string, settings models.GetManyPostSettings) ([]models.Post, error)
+	ServiceGetMany(ctx context.Context, settings models.GetManySettings) ([]models.Post, error)
+	ServiceGetFeed(ctx context.Context, subscriberID string, settings models.GetManySettings) ([]models.Post, error)
+	ServiceGetPost(ctx context.Context, postID string) (models.Post, error)
 }
