@@ -6,7 +6,7 @@ import (
 )
 
 type UserStorage interface {
-	AddUser(ctx context.Context, entity *UserEntity) (*models.User, error)
+	AddUser(ctx context.Context, entity UserEntity) (*models.User, error)
 	GetUser(ctx context.Context, userID string) (*models.User, error)
 }
 
@@ -17,7 +17,7 @@ type SubscriptionStorage interface {
 }
 
 type PostStorage interface {
-	AddPost(ctx context.Context, postEntity *PostEntity) (*models.Post, error)
+	AddPost(ctx context.Context, postEntity PostEntity) (*models.Post, error)
 	GetManyPosts(ctx context.Context, limit, offset int, sort string) ([]*models.Post, error)
 	RemovePost(ctx context.Context, id string) error
 	GetFeed(ctx context.Context, subscriberID string, limit, offset int) ([]*models.Post, error)

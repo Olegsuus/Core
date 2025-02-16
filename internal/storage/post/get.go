@@ -24,8 +24,8 @@ func (s *PostStorage) GetPost(ctx context.Context, postID string) (*models.Post,
 		}
 	}
 
-	var postEntity *storage.PostEntity
-	if err = s.db.GetContext(ctx, postEntity, query, args...); err != nil {
+	var postEntity storage.PostEntity
+	if err = s.db.GetContext(ctx, &postEntity, query, args...); err != nil {
 		return nil, errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "не удалось получить пост",
@@ -57,7 +57,7 @@ func (s *PostStorage) GetFeed(ctx context.Context, subscriberID string, limit, o
 		}
 	}
 
-	var postsEntity []*storage.PostEntity
+	var postsEntity []storage.PostEntity
 	if err = s.db.SelectContext(ctx, &postsEntity, query, args...); err != nil {
 		return nil, errors.AppError{
 			BusinessError: err.Error(),
@@ -88,7 +88,7 @@ func (s *PostStorage) GetManyPosts(ctx context.Context, limit, offset int, sort 
 		}
 	}
 
-	var postsEntity []*storage.PostEntity
+	var postsEntity []storage.PostEntity
 	if err := s.db.SelectContext(ctx, &postsEntity, query, args...); err != nil {
 		return nil, errors.AppError{
 			BusinessError: err.Error(),

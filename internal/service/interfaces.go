@@ -13,7 +13,7 @@ type UserService interface {
 type SubscriptionService interface {
 	Subscribe(ctx context.Context, userID, subscribedToID string) error
 	Unsubscribe(ctx context.Context, userID, subscribedToID string) error
-	GetSubscribers(ctx context.Context, userID string, limit, offset int) ([]*postpb.User, error)
+	GetSubscribers(ctx context.Context, userID string, limit, page int) ([]*postpb.User, error)
 }
 
 type PostService interface {

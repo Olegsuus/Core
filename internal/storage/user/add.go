@@ -8,11 +8,11 @@ import (
 	apperrors "github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *UserStorage) AddUser(ctx context.Context, userEntity *storage.UserEntity) (*models.User, error) {
+func (s *UserStorage) AddUser(ctx context.Context, userEntity storage.UserEntity) (*models.User, error) {
 	s.l.Info("добавление нового пользователя:", userEntity)
 	query, args, err := squirrel.
 		Insert("users").
-		Columns("name", "email", "password", "created_at").
+		Columns("name", "email", "password").
 		Values(userEntity.Name, userEntity.Email, userEntity.Password).
 		Suffix("RETURNING id, name, email, password").
 		PlaceholderFormat(squirrel.Dollar).

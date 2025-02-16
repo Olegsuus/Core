@@ -8,12 +8,12 @@ import (
 	apperrors "github.com/Olegsuus/Core/pkg/errors"
 )
 
-func (s *PostStorage) AddPost(ctx context.Context, postEntity *storage.PostEntity) (*models.Post, error) {
+func (s *PostStorage) AddPost(ctx context.Context, postEntity storage.PostEntity) (*models.Post, error) {
 	s.l.Info("создание нового поста:", postEntity)
 
 	query, args, err := squirrel.
 		Insert("posts").
-		Columns("user_id", "title", "content", "created_at").
+		Columns("user_id", "title", "content").
 		Values(postEntity.UserID, postEntity.Title, postEntity.Content).
 		Suffix("RETURNING id, user_id, title, content, created_at").
 		PlaceholderFormat(squirrel.Dollar).

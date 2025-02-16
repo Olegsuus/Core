@@ -19,7 +19,7 @@ func NewPostStorage(db *sqlx.DB, l *slog.Logger) *PostStorage {
 	}
 }
 
-func postEntityToModels(entity *storage.PostEntity) *models.Post {
+func postEntityToModels(entity storage.PostEntity) *models.Post {
 	return &models.Post{
 		ID:        entity.ID,
 		UserID:    entity.UserID,

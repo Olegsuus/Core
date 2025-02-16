@@ -16,7 +16,7 @@ func (s *SubscriptionStorage) Subscribe(ctx context.Context, subscriptionEntity 
 
 	query, args, err := squirrel.
 		Insert("subscriptions").
-		Columns("subscriber_id", "subscribed_to_id", "created_at").
+		Columns("subscriber_id", "subscribed_to_id").
 		Values(subscriptionEntity.SubscriberID, subscriptionEntity.SubscribedToID).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()

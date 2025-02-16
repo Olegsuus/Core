@@ -20,7 +20,8 @@ func (s *UserService) AddUser(ctx context.Context, name, email, password string)
 		Password: string(hashedPassword),
 	}
 
-	user, err = s.userStorage.AddUser(ctx, modelsToEntity(user))
+	userEntity := modelsToEntity(user)
+	user, err = s.userStorage.AddUser(ctx, *userEntity)
 	if err != nil {
 		return nil, fmt.Errorf("Storage.AddUser: %w", err)
 	}

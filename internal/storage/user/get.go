@@ -23,8 +23,8 @@ func (s *UserStorage) GetUser(ctx context.Context, userID string) (*models.User,
 		}
 	}
 
-	var userEntity *storage.UserEntity
-	if err = s.db.GetContext(ctx, userEntity, query, args...); err != nil {
+	var userEntity storage.UserEntity
+	if err = s.db.GetContext(ctx, &userEntity, query, args...); err != nil {
 		return nil, errors.AppError{
 			BusinessError: err.Error(),
 			UserError:     "не удалось получить пользователя",

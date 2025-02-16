@@ -19,7 +19,7 @@ func NewUserStorage(db *sqlx.DB, l *slog.Logger) *UserStorage {
 	}
 }
 
-func userEntityToModels(entity *storage.UserEntity) *models.User {
+func userEntityToModels(entity storage.UserEntity) *models.User {
 	return &models.User{
 		ID:        entity.ID,
 		Name:      entity.Name,

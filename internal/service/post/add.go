@@ -14,7 +14,9 @@ func (s *PostService) AddPost(ctx context.Context, title, content, userID string
 		Content: content,
 	}
 
-	post, err := s.postStorage.AddPost(ctx, modelsToEntity(newPost))
+	postEntity := modelsToEntity(newPost)
+
+	post, err := s.postStorage.AddPost(ctx, *postEntity)
 	if err != nil {
 		return nil, fmt.Errorf("StorageAdd: %w", err)
 	}

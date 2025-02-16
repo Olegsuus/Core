@@ -11,9 +11,8 @@ func (h *SubscriptionGRPCHandler) GetSubscribers(ctx context.Context, req *postp
 	userID := req.GetUserId()
 	limit := req.GetLimit()
 	page := req.GetPage()
-	offset := (page - 1) * limit
 
-	subscribers, err := h.subscriptionService.GetSubscribers(ctx, userID, int(limit), int(offset))
+	subscribers, err := h.subscriptionService.GetSubscribers(ctx, userID, int(limit), int(page))
 	if err != nil {
 		h.l.Debug("ошибка при получении подписчиков пользователя",
 			slog.String("details", fmt.Sprintf("userID: %s", userID)),

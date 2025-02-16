@@ -7,8 +7,13 @@ import (
 	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
-func (s *SubscriptionService) GetSubscribers(ctx context.Context, userID string, limit, offset int,
+func (s *SubscriptionService) GetSubscribers(ctx context.Context, userID string, limit, page int,
 ) ([]*postpb.User, error) {
+
+	if page <= 0 {
+		page = 1
+	}
+	offset := (page - 1) * limit
 
 	subscribers, err := s.subscriptionStorage.GetSubscribers(ctx, userID, limit, offset)
 	if err != nil {

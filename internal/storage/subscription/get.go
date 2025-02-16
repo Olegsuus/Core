@@ -43,13 +43,3 @@ func (s *SubscriptionStorage) GetSubscribers(ctx context.Context, userID string,
 
 	return users, err
 }
-
-func userEntityToModels(entity storage.UserEntity) *models.User {
-	return &models.User{
-		ID:        entity.ID,
-		Name:      entity.Name,
-		Email:     entity.Email,
-		Password:  entity.Password,
-		CreatedAt: entity.CreatedAt,
-	}
-}
