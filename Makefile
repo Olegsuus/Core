@@ -31,6 +31,3 @@ compose:
 
 compose-reset:
 	docker-compose down -v && docker-compose up --build
-
-compose-update-app:
-	dockr-compose down && docker-compose up --build
