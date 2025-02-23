@@ -3,16 +3,10 @@ package app
 import (
 	"fmt"
 	"github.com/Olegsuus/Core/cmd/config"
-	handlers "github.com/Olegsuus/Core/internal/handlers/post"
-	handlers3 "github.com/Olegsuus/Core/internal/handlers/subscription"
-	handlers2 "github.com/Olegsuus/Core/internal/handlers/user"
+	"github.com/Olegsuus/Core/internal/handlers"
 	"github.com/Olegsuus/Core/internal/logger"
-	service "github.com/Olegsuus/Core/internal/service/post"
-	service3 "github.com/Olegsuus/Core/internal/service/subscription"
-	service2 "github.com/Olegsuus/Core/internal/service/user"
-	storage "github.com/Olegsuus/Core/internal/storage/post"
-	storage3 "github.com/Olegsuus/Core/internal/storage/subscription"
-	storage2 "github.com/Olegsuus/Core/internal/storage/user"
+	"github.com/Olegsuus/Core/internal/service"
+	storage "github.com/Olegsuus/Core/internal/storage/postgres"
 	"github.com/Olegsuus/Core/pkg/db/postgres"
 	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 	"github.com/jmoiron/sqlx"
@@ -52,17 +46,11 @@ func NewApp(cfg *config.Config, interceptor grpc.UnaryServerInterceptor) (*App, 
 
 	l := slog.Default()
 
-	postStorage := storage.NewPostStorage(db, l)
-	userStorage := storage2.NewUserStorage(db, l)
-	subStorage := storage3.NewSubscriptionStorage(db, l)
+	repository := storage.NewRepositoryImpl(db, l)
 
-	postService := service.NewPostService(postStorage)
-	userService := service2.NewServiceUser(userStorage)
-	subService := service3.NewSubscriptionService(subStorage)
+	services := service.NewServicesImpl(repository)
 
-	postGRPCHandler := handlers.NewPostGRPCHandler(postService, l)
-	userGRPCHandler := handlers2.NewUserGRPCHandler(userService, l)
-	subGRPCHandler := handlers3.NewSubscriptionGRPCHandler(subService, l)
+	handlersGRPC := handlers.NewGRPCHandlers(services, l)
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	lis, err := net.Listen("tcp", addr)
@@ -79,9 +67,9 @@ func NewApp(cfg *config.Config, interceptor grpc.UnaryServerInterceptor) (*App, 
 		grpcServer = grpc.NewServer()
 	}
 
-	postpb.RegisterPostServiceServer(grpcServer, postGRPCHandler)
-	postpb.RegisterUserServiceServer(grpcServer, userGRPCHandler)
-	postpb.RegisterSubscriptionServiceServer(grpcServer, subGRPCHandler)
+	postpb.RegisterPostServiceServer(grpcServer, handlersGRPC)
+	postpb.RegisterUserServiceServer(grpcServer, handlersGRPC)
+	postpb.RegisterSubscriptionServiceServer(grpcServer, handlersGRPC)
 
 	return &App{
 		GrpcServer: grpcServer,

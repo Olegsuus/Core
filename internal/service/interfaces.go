@@ -2,24 +2,29 @@ package service
 
 import (
 	"context"
-	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
 )
 
+type Service interface {
+	User() UserService
+	Subscription() SubscriptionService
+	Post() PostService
+}
+
 type UserService interface {
-	AddUser(ctx context.Context, name, email, password string) (*postpb.User, error)
-	GetUser(ctx context.Context, userID string) (*postpb.User, error)
+	AddUser(ctx context.Context, param AddUserParam) (*User, error)
+	GetUser(ctx context.Context, userID string) (*User, error)
 }
 
 type SubscriptionService interface {
-	Subscribe(ctx context.Context, userID, subscribedToID string) error
-	Unsubscribe(ctx context.Context, userID, subscribedToID string) error
-	GetSubscribers(ctx context.Context, userID string, limit, page int) ([]*postpb.User, error)
+	Subscribe(ctx context.Context, param SubscribersParam) error
+	Unsubscribe(ctx context.Context, param SubscribersParam) error
+	GetSubscribers(ctx context.Context, userID string, param GetManyParam) ([]User, error)
 }
 
 type PostService interface {
-	AddPost(ctx context.Context, title, content, userID string) (*postpb.Post, error)
+	AddPost(ctx context.Context, param AddPostParam) (*Post, error)
 	RemovePost(ctx context.Context, id string) error
-	GetManyPosts(ctx context.Context, limit, offset int, order bool) ([]*postpb.Post, error)
-	GetFeed(ctx context.Context, subscriberID string, limit, offset int) ([]*postpb.Post, error)
-	GetPost(ctx context.Context, postID string) (*postpb.Post, error)
+	GetManyPosts(ctx context.Context, settings GetManyParam) ([]Post, error)
+	GetFeed(ctx context.Context, subscriberID string, settings GetManyParam) ([]Post, error)
+	GetPost(ctx context.Context, postID string) (*Post, error)
 }
