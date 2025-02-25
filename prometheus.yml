@@ -1,7 +1,10 @@
 global:
   scrape_interval: 15s
+  external_labels:
+    cluster: "local"
+    replica: "0"
 
 scrape_configs:
-  - job_name: 'app'
+  - job_name: "app"
     static_configs:
-      - targets: ['app:2112']
+      - targets: ["app:2112"]

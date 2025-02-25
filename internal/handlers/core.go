@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/Olegsuus/Core/internal/service"
-	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
+	postpb2 "github.com/Olegsuus/Core/proto/gen/go/core/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log/slog"
 )
@@ -10,9 +10,9 @@ import (
 type GRPCHandlers struct {
 	service *service.ServicesImpl
 	l       *slog.Logger
-	postpb.UnimplementedPostServiceServer
-	postpb.UnimplementedSubscriptionServiceServer
-	postpb.UnimplementedUserServiceServer
+	postpb2.UnimplementedPostServiceServer
+	postpb2.UnimplementedSubscriptionServiceServer
+	postpb2.UnimplementedUserServiceServer
 }
 
 func NewGRPCHandlers(service *service.ServicesImpl, l *slog.Logger) *GRPCHandlers {
@@ -22,8 +22,8 @@ func NewGRPCHandlers(service *service.ServicesImpl, l *slog.Logger) *GRPCHandler
 	}
 }
 
-func userModelsToGRPC(user service.User) *postpb.User {
-	return &postpb.User{
+func userModelsToGRPC(user service.User) *postpb2.User {
+	return &postpb2.User{
 		Id:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
@@ -32,8 +32,8 @@ func userModelsToGRPC(user service.User) *postpb.User {
 	}
 }
 
-func postModelsToGRPC(post service.Post) *postpb.Post {
-	return &postpb.Post{
+func postModelsToGRPC(post service.Post) *postpb2.Post {
+	return &postpb2.Post{
 		Id:        post.ID,
 		Title:     post.Title,
 		UserId:    post.UserID,

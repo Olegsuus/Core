@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   postgres:
+    container_name: postgres
     image: postgres:14
     environment:
       POSTGRES_DB: "instagramm_db"
@@ -18,6 +19,7 @@ services:
       retries: 5
 
   app:
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
@@ -39,13 +41,87 @@ services:
     command: ["./app"]
 
   prometheus:
-     image: prom/prometheus:latest
-     ports:
-       - "9090:9090"
-     volumes:
-       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-     depends_on:
-       - app
+    container_name: prometheus
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.min-block-duration=2h'
+      - '--storage.tsdb.max-block-duration=2h'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+  minio:
+    container_name: minio
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9011"
+    ports:
+      - "9001:9000"      # API: контейнерный 9000 → хост 9001
+      - "9011:9011"      # Веб-консоль: http://localhost:9011
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/ready || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - minio_data:/data
+
+  thanos-sidecar:
+    container_name: thanos-sidecar
+    image: thanosio/thanos:v0.33.0
+    user: root
+    command:
+      - sidecar
+      - --prometheus.url=http://prometheus:9090
+      - --tsdb.path=/prometheus
+      - --objstore.config-file=/etc/thanos/objstore.yaml
+    volumes:
+      - prometheus_data:/prometheus
+      - ./thanos/objstore.yaml:/etc/thanos/objstore.yaml
+    depends_on:
+      - prometheus
+      - minio
+
+  thanos-query:
+    container_name: thanos-query
+    image: thanosio/thanos:v0.33.0
+    command:
+      - query
+      - --http-address=0.0.0.0:9091
+      - --store=thanos-sidecar:10901
+    ports:
+      - "9091:9091"
+    depends_on:
+      - thanos-sidecar
+    networks:
+      default:
+        aliases:
+          - thanos-query
+
+  thanos-compactor:
+    container_name: thanos-compactor
+    image: thanosio/thanos:v0.33.0
+    command:
+      - compact
+      - --data-dir=/thanos/compact
+      - --objstore.config-file=/etc/thanos/objstore.yaml
+      - --retention.resolution-raw=30d
+    volumes:
+      - prometheus_data:/prometheus
+      - ./thanos/objstore.yaml:/etc/thanos/objstore.yaml
+    depends_on:
+      - minio
+    networks:
+      default:
+        aliases:
+          - thanos-compactor
 
 volumes:
   pgdata:
+  prometheus_data:
+  minio_data:

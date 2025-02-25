@@ -48,6 +48,6 @@ type AddPostParam struct {
 }
 
 type SubscribersParam struct {
-	SubscriberID   string `db:"subscriber_id"`
-	SubscribedToID string `db:"subscribed_to_id"`
+	SubscriberID   string
+	SubscribedToID string
 }

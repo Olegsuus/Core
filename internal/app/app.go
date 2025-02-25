@@ -8,7 +8,7 @@ import (
 	"github.com/Olegsuus/Core/internal/service"
 	storage "github.com/Olegsuus/Core/internal/storage/postgres"
 	"github.com/Olegsuus/Core/pkg/db/postgres"
-	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
+	"github.com/Olegsuus/Core/proto/gen/go/core/proto"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"log"

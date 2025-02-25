@@ -55,5 +55,6 @@ func (s *ServicesImpl) Unsubscribe(ctx context.Context, param SubscribersParam) 
 	if err := s.repository.Unsubscribe(ctx, subscription); err != nil {
 		return fmt.Errorf("Storage.Unsubscribe: %w", err)
 	}
+
 	return nil
 }

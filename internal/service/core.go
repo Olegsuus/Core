@@ -14,13 +14,6 @@ func NewServicesImpl(repository *storage.RepositoryImpl) *ServicesImpl {
 	}
 }
 
-func modelsSubscriptionToEntity(subscription *Subscription) *storage.SubscriptionEntity {
-	return &storage.SubscriptionEntity{
-		SubscriberID:   subscription.SubscriberID,
-		SubscribedToID: subscription.SubscribedToID,
-	}
-}
-
 func userEntityToModels(entity storage.UserEntity) *User {
 	return &User{
 		ID:        entity.ID,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	models "github.com/Olegsuus/Core/internal/service"
-	postpb "github.com/Olegsuus/Core/settings_grpc/go/core/proto"
+	"github.com/Olegsuus/Core/proto/gen/go/core/proto"
 	"log/slog"
 	"time"
 )
